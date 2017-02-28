@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Voting App</title>
+  </head>
+  <body>
+  <p>Vote Now!</p>
+  <form action="/vote" method="post">
+    <div>
+      <label for="sandwiches-button">Sandwiches</label>
+      <input name="yourVote" id="sandwiches-button" type="radio" value="sandwiches" />
+    </div>
+    <div>
+      <label for="tacos-button">Tacos</label>
+      <input name="yourVote" id="tacos-button" type="radio" value="tacos" />
+    </div>
+    <input type="submit" name="submit" id="submit" value="Vote!" />
+  </form>
+  <ul>
+    <li>Sandwiches: <%= votes.sandwiches %></li>
+    <li>Tacos: <%= votes.tacos %></li>
+  </ul>  
+  </body>
+</html>
