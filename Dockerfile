@@ -1,4 +1,7 @@
 FROM node:4-onbuild
+
+LABEL maintainer jon-friskics@pluralsight.com
+
 EXPOSE 8888
 
 RUN mkdir -p /usr/src/app
