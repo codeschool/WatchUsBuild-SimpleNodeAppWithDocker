@@ -6,31 +6,22 @@ let bodyParser = require('body-parser');
 let ejs = require('ejs');
 let pg = require('pg');
 
-let client = new pg.Client('postgres://postgres:blahblah@localhost:9000');
-client.connect(function (err) {
-  if (err) throw err;
-  // client.query('CREATE TABLE IF NOT EXISTS votes (string string timestamptz)', function(err, result) {
-  //   if(err) throw err;
-  //   console.log(result);
-  // });
-  // client.query('DELETE FROM votes', function(err, result) {
-  //   if (err) throw err;
-  //   console.log(result);
-  // });
-  // client.query('INSERT INTO votes (string string) VALUES ($1)', "")
-  client.query('SELECT number_of_votes FROM votes WHERE option_name="$1"', ['sandwiches'], function (err, result) {
-    if (err) throw err;
-    console.log(result.rows[0]); // outputs: { name: 'brianc' } 
-    client.end(function (err) {
-      if (err) throw err;
-    });
-  });
-});
+let client = new pg.Client('postgres://postgres:blahblah@172.17.0.1:9000/postgres');
 
 let votes = {
   sandwiches: 0,
   tacos: 0
 };
+
+client.connect(function (err) {
+  if (err) throw err;
+  client.query('SELECT number_of_votes FROM votes', function (err, result) {
+    if (err) throw err;
+
+    votes.sandwiches = result.rows[0].number_of_votes;
+    votes.tacos = result.rows[1].number_of_votes;
+  });
+});
 
 let urlencodedParser = bodyParser.urlencoded({ extended: false })
 
@@ -47,8 +38,14 @@ app.post('/vote', urlencodedParser, function(req, res) {
   let vote = req.body.yourVote;
   if(vote === 'sandwiches') {
     votes.sandwiches = votes.sandwiches + 1;
+      client.query('UPDATE votes SET number_of_votes=\'' + votes.sandwiches + '\' WHERE option_name=\'sandwiches\'', function (err, result) {
+        if (err) throw err;
+      });
   } else if(vote === 'tacos') {
     votes.tacos = votes.tacos + 1;
+      client.query('UPDATE votes SET number_of_votes=\'' + votes.tacos + '\' WHERE option_name=\'tacos\'', function (err, result) {
+        if (err) throw err;
+      });
   } else {
     console.log('Something went wrong: vote contains ' + vote);
   }
